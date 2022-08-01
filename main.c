@@ -21,14 +21,14 @@ int main(int argc, char *argv[])
 
     int *testval = malloc(sizeof(int));
     *testval = 100;
-    list_append(mylist, testval);
+    // list_append(mylist, testval);
+    list_insert_after(mylist, testval, 0);
     printf("size: %d\n", mylist->size);
     // remove last element
     int *torm;
     if (list_remove_at(mylist, mylist->size - 1, (void **)&torm))
     {
-        printf("removed %d at %p from the list (%p)\n", *torm, torm, testval);
-        free(torm);
+        printf("removed %d at %p from the list\n", *torm, torm, testval);
         printf("size: %d\n", mylist->size);
     }
 
@@ -45,6 +45,31 @@ int main(int argc, char *argv[])
     printf("prev of third:          %p\n", list_at(mylist, 2)->prev);
     printf("address of third index: %p: %d\n", list_at(mylist, 2), *(int *)list_at(mylist, 2)->value);
     printf("next of third:          %p\n\n", list_at(mylist, 2)->next);
+
+    // but it can also be done with c-strings
+    DoubleLinkedList *clist = create_list();
+    char *first = "This is a c-string in the double linked-list";
+    list_append(clist, first);
+    printf("%p : %s\n", clist->head->value, (char *)clist->head->value);
+
+    // or a float
+    DoubleLinkedList *flist = create_list();
+    float myfloat = 9.7f;
+    list_append(flist, &myfloat);
+    printf("%p : %f\n", flist->head->value, *(float *)flist->head->value);
+
+    // or a list in a list
+    DoubleLinkedList *dlist = create_list();
+    list_append(dlist, mylist);
+    // DoubleLinkedListNode *dlistval = ((DoubleLinkedList *)dlist->head->value)->head->next;
+    DoubleLinkedListNode *dlistval = list_at(list_at(dlist, 0)->value, 1);
+    int newval = 9;
+    dlistval->value = &newval;
+    printf("first index of the first index: %p : %d\n", dlistval, *(int *)list_at(mylist, 1)->value);
+    // although this obviously shows difficult
+    // cause when you go out of bounds, the program segfaults (and this is easy to do)
+
+    // And it is not recommended to have different types together in one list
 
     return 0;
 }
