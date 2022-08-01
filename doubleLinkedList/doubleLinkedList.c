@@ -4,7 +4,7 @@
 
 // LOCAL PROTOTYPES //
 
-int node_append_end_linkage(DoubleLinkedListNode *node, void *value);
+int _node_append_end_linkage(DoubleLinkedListNode *node, void *value, DoubleLinkedListNode **out);
 
 // END LOCAL PROTOTYPES //
 
@@ -16,14 +16,16 @@ DoubleLinkedList *create_list()
         return NULL;
     }
     tmp->head = NULL;
+    tmp->tail = NULL;
     tmp->size = 0;
     return tmp;
 }
 
-int node_append_end_linkage(DoubleLinkedListNode *node, void *value)
+int _node_append_end_linkage(DoubleLinkedListNode *node, void *value, DoubleLinkedListNode **out)
 {
     if (node == NULL || value == NULL)
     {
+        *out = NULL;
         return 0;
     }
 
@@ -33,6 +35,7 @@ int node_append_end_linkage(DoubleLinkedListNode *node, void *value)
         DoubleLinkedListNode *tmp = malloc(sizeof(DoubleLinkedListNode));
         if (tmp == NULL)
         {
+            *out = NULL;
             return 0;
         }
         tmp->prev = node;
@@ -40,10 +43,11 @@ int node_append_end_linkage(DoubleLinkedListNode *node, void *value)
         tmp->value = value;
 
         node->next = tmp;
+        *out = tmp;
         return 1;
     }
 
-    return node_append_end_linkage(node->next, value);
+    return _node_append_end_linkage(node->next, value, out);
 }
 
 int list_append(DoubleLinkedList *list, void *value)
@@ -65,13 +69,16 @@ int list_append(DoubleLinkedList *list, void *value)
         tmp->value = value;
 
         list->head = tmp;
+        list->tail = tmp;
         list->size++;
         return 1;
     }
 
-    int result = node_append_end_linkage(list->head, value);
+    DoubleLinkedListNode *totail;
+    int result = _node_append_end_linkage(list->head, value, &totail);
     if (result)
     {
+        list->tail = totail;
         list->size++;
     }
     return result;
@@ -84,14 +91,30 @@ DoubleLinkedListNode *list_at(DoubleLinkedList *list, unsigned long long index)
         return NULL;
     }
 
-    DoubleLinkedListNode *current = list->head;
-    while (current != NULL && index > 0)
+    // optimizing by differentiating between "near end" and "near begin"
+    if (index > list->size / 2)
     {
-        current = current->next;
-        index--;
+        DoubleLinkedListNode *current = list->tail;
+        int cur = list->size;
+        while (current != NULL && cur < index)
+        {
+            current = current->prev;
+            cur--;
+        }
+        return current;
     }
+    else
+    {
+        DoubleLinkedListNode *current = list->head;
+        while (current != NULL && index > 0)
+        {
+            current = current->next;
+            index--;
+        }
 
-    return current;
+        return current;
+    }
+    return NULL;
 }
 
 int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
@@ -135,6 +158,11 @@ int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
     if (next != NULL)
     {
         next->prev = prev;
+    }
+    else if (next == NULL && prev != NULL)
+    {
+        // means that `node` was the tail
+        list->tail = prev;
     }
     if (prev != NULL)
     {
@@ -226,5 +254,11 @@ int list_insert_after(DoubleLinkedList *list, void *value, unsigned long long in
     }
     node->next = tmp;
     list->size++;
+
+    // when its at the end of the list (the tail)
+    if (tmp->next == NULL)
+    {
+        list->tail = tmp;
+    }
     return 1;
 }
