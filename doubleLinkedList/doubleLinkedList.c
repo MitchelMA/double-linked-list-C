@@ -106,14 +106,14 @@ int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
     if (index == 0)
     {
         DoubleLinkedListNode *head = list->head;
-        DoubleLinkedListNode *over = list->head->next;
+        DoubleLinkedListNode *next = head->next;
         *out = head->value;
 
-        if (over != NULL)
+        if (next != NULL)
         {
-            over->prev = NULL;
+            next->prev = NULL;
         }
-        list->head = over;
+        list->head = next;
         free(head);
         list->size--;
         return 1;
@@ -121,13 +121,13 @@ int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
 
     // other indices
     DoubleLinkedListNode *node = list_at(list, index);
-    DoubleLinkedListNode *next = node->next;
-    DoubleLinkedListNode *prev = node->prev;
     if (node == NULL)
     {
         *out = NULL;
         return 0;
     }
+    DoubleLinkedListNode *next = node->next;
+    DoubleLinkedListNode *prev = node->prev;
 
     *out = node->value;
 
@@ -140,5 +140,116 @@ int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
     {
         prev->next = next;
     }
+    list->size--;
+    return 1;
+}
+
+int list_insert_before(DoubleLinkedList *list, void *value, unsigned long long index)
+{
+    if (list == NULL || list->head == NULL || value == NULL)
+    {
+        return 0;
+    }
+
+    if (index == 0)
+    {
+        DoubleLinkedListNode *head = list->head;
+        DoubleLinkedListNode *tmp = malloc(sizeof(DoubleLinkedListNode));
+        if (tmp == NULL)
+        {
+            return 0;
+        }
+        tmp->next = head;
+        tmp->prev = NULL;
+        tmp->value = value;
+
+        head->prev = tmp;
+        list->head = tmp;
+        list->size++;
+        return 1;
+    }
+
+    DoubleLinkedListNode *node = list_at(list, index);
+    if (node == NULL)
+    {
+        return 0;
+    }
+    DoubleLinkedListNode *prev = node->prev;
+
+    DoubleLinkedListNode *tmp = malloc(sizeof(DoubleLinkedListNode));
+    if (tmp == NULL)
+    {
+        return 0;
+    }
+
+    tmp->value = value;
+    tmp->next = node;
+    tmp->prev = prev;
+    if (prev != NULL)
+    {
+        prev->next = tmp;
+    }
+    node->prev = tmp;
+    list->size++;
+
+    return 1;
+}
+
+int list_insert_after(DoubleLinkedList *list, void *value, unsigned long long index)
+{
+    if (list == NULL || list->head == NULL || value == NULL)
+    {
+        return 0;
+    }
+
+    // insert directly after the head of the list
+    if (index == 0)
+    {
+        DoubleLinkedListNode *head = list->head;
+        DoubleLinkedListNode *next = head->next;
+
+        DoubleLinkedListNode *tmp = malloc(sizeof(DoubleLinkedListNode));
+        if (tmp == NULL)
+        {
+            return 0;
+        }
+
+        tmp->value = value;
+        tmp->next = next;
+        tmp->prev = head;
+
+        head->next = tmp;
+        if (next != NULL)
+        {
+            next->prev = tmp;
+        }
+        list->size++;
+        return 1;
+    }
+
+    DoubleLinkedListNode *node = list_at(list, index);
+    if (node == NULL)
+    {
+        return 0;
+    }
+
+    DoubleLinkedListNode *next = node->next;
+
+    DoubleLinkedListNode *tmp = malloc(sizeof(DoubleLinkedListNode));
+    if (tmp == NULL)
+    {
+        return 0;
+    }
+
+    tmp->value = value;
+    tmp->prev = node;
+    tmp->next = next;
+
+    if (next != NULL)
+    {
+        next->prev = tmp;
+    }
+    node->next = tmp;
+    list->size++;
     return 1;
 }

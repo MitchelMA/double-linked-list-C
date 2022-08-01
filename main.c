@@ -23,13 +23,12 @@ int main(int argc, char *argv[])
     *testval = 100;
     list_append(mylist, testval);
     printf("size: %d\n", mylist->size);
-    printf("Node-address: %p\n", list_at(mylist, mylist->size - 1));
     // remove last element
     int *torm;
     if (list_remove_at(mylist, mylist->size - 1, (void **)&torm))
     {
         printf("removed %d at %p from the list (%p)\n", *torm, torm, testval);
-        free(testval);
+        free(torm);
         printf("size: %d\n", mylist->size);
     }
 
@@ -45,6 +44,7 @@ int main(int argc, char *argv[])
 
     printf("prev of third:          %p\n", list_at(mylist, 2)->prev);
     printf("address of third index: %p: %d\n", list_at(mylist, 2), *(int *)list_at(mylist, 2)->value);
-    printf("next of third:          %p\n", list_at(mylist, 2)->next);
+    printf("next of third:          %p\n\n", list_at(mylist, 2)->next);
+
     return 0;
 }
