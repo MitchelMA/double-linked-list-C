@@ -202,7 +202,7 @@ DoubleLinkedListNode *list_at(DoubleLinkedList *list, unsigned long long index)
     if (index > list->size / 2)
     {
         DoubleLinkedListNode *current = list->tail;
-        int cur = list->size;
+        int cur = list->size - 1;
         while (current != NULL && cur < index)
         {
             current = current->prev;
@@ -243,6 +243,11 @@ int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
         {
             next->prev = NULL;
         }
+        else
+        {
+            // meanst that the head was also the tail
+            list->tail = NULL;
+        }
         list->head = next;
         free(head);
         list->size--;
@@ -266,7 +271,7 @@ int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
     {
         next->prev = prev;
     }
-    else if (next == NULL && prev != NULL)
+    else
     {
         // means that `node` was the tail
         list->tail = prev;
@@ -275,14 +280,77 @@ int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
     {
         prev->next = next;
     }
+    else
+    {
+        // means that `node` was the head
+        list->head = next;
+    }
     list->size--;
     return 1;
 }
 
 int list_remove_head(DoubleLinkedList *list, void **oldheadvalue)
 {
+    if (list == NULL || list->head == NULL)
+    {
+        *oldheadvalue = NULL;
+        return 0;
+    }
+
+    DoubleLinkedListNode *head = list->head;
+    DoubleLinkedListNode *next = head->next;
+    if (head == NULL)
+    {
+        *oldheadvalue = NULL;
+        return 0;
+    }
+
+    list->head = next;
+    if (next != NULL)
+    {
+        list->head->prev = NULL;
+    }
+    else
+    {
+        // head was also the tail
+        list->tail = NULL;
+    }
+    *oldheadvalue = head->value;
+    free(head);
+    list->size--;
+    return 1;
 }
 
 int list_remove_tail(DoubleLinkedList *list, void **oldtailvalue)
 {
+    if (list == NULL || list->tail == NULL)
+    {
+        *oldtailvalue = NULL;
+        return 0;
+    }
+
+    DoubleLinkedListNode *tail = list->tail;
+    DoubleLinkedListNode *prev = tail->prev;
+
+    if (tail == NULL)
+    {
+        *oldtailvalue = NULL;
+        return 0;
+    }
+
+    list->tail = prev;
+    if (prev != NULL)
+    {
+        list->tail->next = NULL;
+    }
+    else
+    {
+        // tail was also the head
+        list->head = NULL;
+    }
+
+    *oldtailvalue = tail->value;
+    free(tail);
+    list->size--;
+    return 1;
 }
