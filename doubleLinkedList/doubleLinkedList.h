@@ -18,6 +18,8 @@ struct DoubleLinkedListNode
 };
 
 DoubleLinkedList *create_list();
-int append_to_list(DoubleLinkedList *list, void *value);
+int list_append(DoubleLinkedList *list, void *value);
+DoubleLinkedListNode *list_at(DoubleLinkedList *list, unsigned long long index);
+int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out);
 
 #endif // __DOUBLE_LINKED_LIST_H__
