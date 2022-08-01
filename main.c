@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
     list_append(mylist, &value);
     list_push(mylist, &value2);
     list_append(mylist, &value3);
-    printf("address and value: %p : %d\n", &value, *(int *)list_at(mylist, 0)->value);
-    printf("address and value: %p : %d\n", &value2, *(int *)list_at(mylist, 1)->value);
+    printf("address and value: %p : %d\n", &value2, *(int *)list_at(mylist, 0)->value);
+    printf("address and value: %p : %d\n", &value, *(int *)list_at(mylist, 1)->value);
     printf("address and value: %p : %d\n", &value3, *(int *)list_at(mylist, 2)->value);
     printf("list-size: %d\n\n", mylist->size);
     printf("address of first  index: %p\n", list_at(mylist, 0));
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     DoubleLinkedListNode *dlistval = list_at(list_at(dlist, 0)->value, 1);
     int newval = 9;
     dlistval->value = &newval;
-    printf("first index of the first index: %p : %d\n", dlistval, *(int *)list_at(mylist, 1)->value);
+    printf("first index of the first index: %p (%p) : %d\n", dlistval, list_at(mylist, 1), *(int *)list_at(mylist, 1)->value);
     // although this obviously shows difficult
     // cause when you go out of bounds, the program segfaults (and this is easy to do)
 

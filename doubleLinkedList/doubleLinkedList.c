@@ -299,11 +299,6 @@ int list_remove_head(DoubleLinkedList *list, void **oldheadvalue)
 
     DoubleLinkedListNode *head = list->head;
     DoubleLinkedListNode *next = head->next;
-    if (head == NULL)
-    {
-        *oldheadvalue = NULL;
-        return 0;
-    }
 
     list->head = next;
     if (next != NULL)
@@ -331,12 +326,6 @@ int list_remove_tail(DoubleLinkedList *list, void **oldtailvalue)
 
     DoubleLinkedListNode *tail = list->tail;
     DoubleLinkedListNode *prev = tail->prev;
-
-    if (tail == NULL)
-    {
-        *oldtailvalue = NULL;
-        return 0;
-    }
 
     list->tail = prev;
     if (prev != NULL)
