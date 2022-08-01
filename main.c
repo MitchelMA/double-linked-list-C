@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     int value2 = 24;
     int value3 = 50;
     list_append(mylist, &value);
-    list_append(mylist, &value2);
+    list_push(mylist, &value2);
     list_append(mylist, &value3);
     printf("address and value: %p : %d\n", &value, *(int *)list_at(mylist, 0)->value);
     printf("address and value: %p : %d\n", &value2, *(int *)list_at(mylist, 1)->value);
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     printf("size: %d\n", mylist->size);
     // remove last element
     int *torm;
-    if (list_remove_at(mylist, mylist->size - 1, (void **)&torm))
+    if (list_remove_tail(mylist, (void **)&torm))
     {
         printf("removed %d at %p from the list\n", *torm, torm, testval);
         printf("size: %d\n", mylist->size);
