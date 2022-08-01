@@ -202,31 +202,6 @@ int list_insert_after(DoubleLinkedList *list, void *value, unsigned long long in
         return 0;
     }
 
-    // insert directly after the head of the list
-    if (index == 0)
-    {
-        DoubleLinkedListNode *head = list->head;
-        DoubleLinkedListNode *next = head->next;
-
-        DoubleLinkedListNode *tmp = malloc(sizeof(DoubleLinkedListNode));
-        if (tmp == NULL)
-        {
-            return 0;
-        }
-
-        tmp->value = value;
-        tmp->next = next;
-        tmp->prev = head;
-
-        head->next = tmp;
-        if (next != NULL)
-        {
-            next->prev = tmp;
-        }
-        list->size++;
-        return 1;
-    }
-
     DoubleLinkedListNode *node = list_at(list, index);
     if (node == NULL)
     {
