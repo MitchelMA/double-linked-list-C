@@ -193,7 +193,7 @@ int list_insert_after(DoubleLinkedList *list, void *value, unsigned long long in
 
 DoubleLinkedListNode *list_at(DoubleLinkedList *list, unsigned long long index)
 {
-    if (list == NULL || list->head == NULL)
+    if (list == NULL || list->head == NULL || index >= list->size || index < 0)
     {
         return NULL;
     }
@@ -226,7 +226,7 @@ DoubleLinkedListNode *list_at(DoubleLinkedList *list, unsigned long long index)
 
 int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
 {
-    if (list == NULL || list->head == NULL)
+    if (list == NULL || list->head == NULL || index >= list->size || index < 0)
     {
         *out == NULL;
         return 0;
@@ -235,23 +235,12 @@ int list_remove_at(DoubleLinkedList *list, unsigned long long index, void **out)
     // removes the head
     if (index == 0)
     {
-        DoubleLinkedListNode *head = list->head;
-        DoubleLinkedListNode *next = head->next;
-        *out = head->value;
-
-        if (next != NULL)
-        {
-            next->prev = NULL;
-        }
-        else
-        {
-            // meanst that the head was also the tail
-            list->tail = NULL;
-        }
-        list->head = next;
-        free(head);
-        list->size--;
-        return 1;
+        return list_remove_head(list, out);
+    }
+    // removes the tail
+    if (index == list->size - 1)
+    {
+        return list_remove_tail(list, out);
     }
 
     // other indices
