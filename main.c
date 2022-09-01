@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "doubleLinkedList\doubleLinkedList.h"
 
+void undefined_behavior(DoubleLinkedList *list);
+
 int main(int argc, char *argv[])
 {
     DoubleLinkedList *mylist = create_list();
@@ -64,12 +66,40 @@ int main(int argc, char *argv[])
     // DoubleLinkedListNode *dlistval = ((DoubleLinkedList *)dlist->head->value)->head->next;
     DoubleLinkedListNode *dlistval = list_at(list_at(dlist, 0)->value, 1);
     int newval = 9;
-    dlistval->value = &newval;
-    printf("first index of the first index: %p (%p) : %d\n", dlistval, list_at(mylist, 1), *(int *)list_at(mylist, 1)->value);
+    *(int *)dlistval->value = newval;
+    printf("first index of the first index: %p (%p) : %d\n\n", dlistval, list_at(mylist, 1), *(int *)list_at(mylist, 1)->value);
     // although this obviously shows difficult
     // cause when you go out of bounds, the program segfaults (and this is easy to do)
 
     // And it is not recommended to have different types together in one list
 
+    // undefined behavior:
+    // using stack allocated variables after the end of their scope
+    // first create a list
+    DoubleLinkedList *undefined = create_list();
+    // call a function with undefined behavior
+    undefined_behavior(undefined);
+    // try to set a different value
+    *(int *)list_at(undefined, 3)->value = 0x80;
+    // loop through the list to see their addresses and values
+    DoubleLinkedListNode *current = undefined->head;
+    while (current != NULL)
+    {
+        // after dereferencing the first time, the value is unpredictable
+        printf("address: %p; value: %d\n", current->value, *(int *)current->value);
+        current = current->next;
+    }
+
     return 0;
+}
+
+void undefined_behavior(DoubleLinkedList *list)
+{
+    for (int i = 0; i < 10; i++)
+    {
+        int test = 5;
+        list_append(list, &test);
+        // this is undefined behavior, because `test` is dropped from the stack here
+        // thus all the addresses should be the same
+    }
 }
